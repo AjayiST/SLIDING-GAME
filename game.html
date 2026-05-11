@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎨 Frame Puzzle - NFT Community</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="background"></div>
+    
+    <!-- (toggle moved into frames) -->
+    
+    <!-- Start Screen -->
+    <div class="start-screen" id="startScreen">
+        <div class="start-modal">
+            <div class="start-title">🎨 FRAME PUZZLE</div>
+                <button id="darkModeToggle" class="dark-mode-toggle" onclick="toggleDarkMode()" aria-pressed="false" aria-label="Toggle dark mode" title="Toggle dark mode">
+                    <span class="toggle-track" aria-hidden="true">
+                        <span class="toggle-icon sun">☀️</span>
+                        <span class="toggle-icon moon">🌙</span>
+                        <span class="toggle-knob" aria-hidden="true"></span>
+                    </span>
+                </button>
+            <div class="start-subtitle">NFT Community Challenge</div>
+            <p class="start-description">Solve beautiful NFT frame puzzles and climb the leaderboard!</p>
+            
+            <!-- Leaderboard Section on Front Page -->
+            <div class="front-page-leaderboard">
+                <h3>🏆 Top Players 🏆</h3>
+                <div class="leaderboard-list-front" id="leaderboardListFront"></div>
+            </div>
+            
+            <!-- Action Buttons -->
+            <div class="front-page-buttons">
+                <button class="btn-start" onclick="goToGame()" aria-label="Continue to game" title="Continue to game">▶️ Continue to Game</button>
+            </div>
+            
+            <!-- Art Gallery -->
+            <div class="art-gallery" id="artGallery"></div>
+            
+            <p class="start-footer">👇 Click an artwork to begin →</p>
+        </div>
+    </div>
+    
+    <div class="container" id="gameContainer" style="display: none;">
+            <div class="header">            <button class="btn-back" onclick="stopGame()" aria-label="Back" title="Back to home">←</button>            <div class="title">🎨 FRAME PUZZLE</div>
+                <!-- dark-mode toggle is a single movable element (re-parented by JS) --> 
+            <div class="subtitle">NFT Community Challenge</div>
+            <div class="art-indicator" id="artIndicator">🎲 Ready to play</div>
+        </div>
+
+        <div class="stats-container">
+            <div class="stat-box">
+                <div class="stat-label">MOVES</div>
+                <div class="stat-value" id="moveCount">0</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">TIME</div>
+                <div class="stat-value" id="timer">0:00</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">BEST</div>
+                <div class="stat-value" id="bestMoves">-</div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <select class="difficulty-select" id="difficultySelect" onchange="changeDifficulty()">
+                <option value="3">3×3 (Easy)</option>
+                <option value="4" selected>4×4 (Medium)</option>
+                <option value="5">5×5 (Hard)</option>
+            </select>
+            <button class="btn-primary" onclick="shufflePuzzle()">🔀 SHUFFLE</button>
+            <button class="btn-secondary" onclick="resetGame()">🔄 RESET</button>
+            <button class="btn-start-game" onclick="startTimer()">▶️ START</button>
+            <button class="btn-stop" onclick="pauseGame()">⏹️ STOP</button>
+        </div>
+
+        <div class="puzzle-container">
+            <div class="message" id="message"></div>
+            <div class="puzzle-grid grid-4" id="puzzleGrid"></div>
+            <div class="completion-badge" id="completionBadge">
+                ✨ PUZZLE COMPLETED! ✨<br>
+                <span id="finalStats"></span>
+            </div>
+        </div>
+
+        <div id="imagePreview" class="image-preview" style="display: none;">
+            <p>Complete Image Preview</p>
+            <img id="previewImage" src="" alt="Complete puzzle preview">
+        </div>
+
+        <div class="keyboard-hint">
+            💡 Click tiles or use arrow keys to move
+        </div>
+
+        <div class="leaderboard-section">
+            <div class="leaderboard-title">🏆 LEADERBOARD 🏆</div>
+            
+            <div class="name-input-section">
+                <input 
+                    type="text" 
+                    id="playerName" 
+                    class="name-input" 
+                    placeholder="Your X username (e.g., @nftfanatic)"
+                    maxlength="20"
+                >
+                <button class="btn-name" onclick="submitScore()">Save Score</button>
+            </div>
+            
+            <!-- Score Card Section -->
+            <div class="x-post-section" id="xPostSection" style="display: none;">
+                <div class="x-post-container">
+                    <div class="x-post-header">🎉 Score Saved!</div>
+                    <div class="x-post-content" id="xPostContent"></div>
+                </div>
+            </div>
+
+            <div class="leaderboard-list" id="leaderboardList">
+                <div class="empty-leaderboard">📊 No scores yet. Be the first!</div>
+            </div>
+        </div>
+    <!-- Modal & Toast roots -->
+    <div id="modalRoot"></div>
+    <div id="toastRoot" aria-live="polite" aria-atomic="true"></div>
+
+    <script src="script.js"></script>
+</body>
+</html>
