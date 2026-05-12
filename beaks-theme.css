@@ -1,0 +1,813 @@
+/* ========================================
+   🎨 BEAKS THEME - Surrealist Dreamscape UI
+   CSS Theme Layer (Logic-Preserving Override)
+   ======================================== */
+
+/* ========== 1. GLOBAL FOUNDATION ========== */
+
+:root {
+    --midnight-purple: #141224;
+    --dusty-rose: #B88AAA;
+    --gold-accent: #B89A72;
+    --soft-cream: #EFE7DD;
+    --deep-navy: #1B1F34;
+    --rose-dark: #7C5A79;
+}
+
+/* SVG Filter Definition for Stippled Texture */
+svg[id="stipple-filter"] {
+    display: none;
+}
+
+html {
+    height: 100%;
+}
+
+body {
+    background-image: url('assets/nft-art/beak.jpg');
+    background-attachment: fixed;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    position: relative;
+    min-height: 100vh;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    margin: 0;
+    overflow: hidden;
+}
+
+/* Outer blur effect - blurs content outside the game container */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(
+        ellipse 900px 650px at center,
+        rgba(0, 0, 0, 0) 0%,
+        rgba(20, 18, 36, 0.34) 52%,
+        rgba(14, 16, 30, 0.72) 100%
+    );
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* Secondary backdrop filter for subtle blur on outer edges */
+body::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background:
+        radial-gradient(
+            ellipse 980px 720px at center,
+            transparent 0%,
+            rgba(20, 18, 36, 0.18) 58%,
+            rgba(12, 14, 28, 0.5) 100%
+        );
+    backdrop-filter: blur(10px) saturate(0.78);
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* Ensure content sits above vignette */
+.background,
+.start-screen,
+.container,
+#gameContainer {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+}
+
+.start-screen {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background: transparent;
+}
+
+#gameContainer {
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    background: transparent;
+}
+
+/* ========== 2. STIPPLED TEXTURE EFFECT ========== */
+
+/* Create grainy texture overlay using CSS backdrop-filter + noise SVG */
+.start-modal,
+.puzzle-container,
+.stat-box,
+.controls,
+.leaderboard-section {
+    background-image: 
+        url('data:image/svg+xml;charset=utf8,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400"><filter id="noise"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="4" result="noise" /></filter><rect width="400" height="400" fill="white" filter="url(%23noise)" opacity="0.03"/></svg>');
+    background-repeat: repeat;
+    background-size: 200px 200px;
+}
+
+/* ========== 3. START SCREEN & MODALS ========== */
+
+.start-modal {
+    background: linear-gradient(145deg, rgba(27, 31, 52, 0.94) 0%, rgba(20, 18, 36, 0.95) 100%) !important;
+    border: none !important;
+    box-shadow:
+        0 22px 48px rgba(0, 0, 0, 0.52),
+        0 0 46px rgba(184, 138, 170, 0.16),
+        inset 0 0 26px rgba(184, 154, 114, 0.08);
+    border-radius: 12px;
+    backdrop-filter: blur(8px);
+    width: 90%;
+    max-width: 600px;
+    padding: 30px;
+    margin: 0 auto;
+}
+
+.start-title {
+    font-family: 'Playfair Display', serif !important;
+    color: #D8B8C8 !important;
+    font-size: 3em !important;
+    font-weight: 700 !important;
+    letter-spacing: 3px;
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.6);
+    background: none !important;
+    -webkit-background-clip: unset !important;
+    background-clip: unset !important;
+    -webkit-text-fill-color: #D8B8C8 !important;
+}
+
+.start-subtitle {
+    color: var(--gold-accent) !important;
+    font-size: 0.95em !important;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+.start-description {
+    color: var(--soft-cream) !important;
+    font-size: 1em !important;
+    font-weight: 300;
+    letter-spacing: 0.5px;
+    opacity: 0.9;
+}
+
+.front-page-leaderboard h3 {
+    color: #D3B0C3 !important;
+    font-family: 'Playfair Display', serif !important;
+    font-size: 1.2em !important;
+    letter-spacing: 2px;
+    text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.5);
+    margin-bottom: 15px;
+}
+
+/* ========== 4. HEADER & STATS ========== */
+
+.header {
+    background: linear-gradient(180deg, rgba(20, 18, 36, 0.82) 0%, rgba(27, 31, 52, 0.9) 100%);
+    border: none;
+    padding: 20px !important;
+    flex-shrink: 0;
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.54), inset 0 0 18px rgba(184, 138, 170, 0.08);
+}
+
+.title {
+    font-family: 'Playfair Display', serif !important;
+    color: #D8B8C8 !important;
+    font-size: 2.2em !important;
+    letter-spacing: 2px;
+    text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.8);
+    background: none !important;
+    -webkit-background-clip: unset !important;
+    background-clip: unset !important;
+    -webkit-text-fill-color: #D8B8C8 !important;
+}
+
+.subtitle {
+    color: var(--gold-accent) !important;
+    font-size: 0.85em !important;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.art-indicator {
+    color: var(--soft-cream) !important;
+    font-size: 0.9em;
+    margin-top: 8px;
+    padding: 10px 18px !important;
+    background: linear-gradient(135deg, rgba(184, 138, 170, 0.55) 0%, rgba(124, 90, 121, 0.75) 100%) !important;
+    border-radius: 999px !important;
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.36), 0 0 12px rgba(184, 138, 170, 0.25) !important;
+}
+
+.gallery-title {
+    color: #D3B0C3 !important;
+    letter-spacing: 0.8px;
+    text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.45);
+}
+
+.stat-box {
+    background: linear-gradient(135deg, rgba(184, 138, 170, 0.18) 0%, rgba(184, 154, 114, 0.14) 100%) !important;
+    border: none !important;
+    box-shadow:
+        inset 0 0 20px rgba(184, 138, 170, 0.14),
+        0 8px 16px rgba(0, 0, 0, 0.42),
+        0 2px 6px rgba(184, 154, 114, 0.1);
+    border-radius: 12px !important;
+}
+
+.stat-label {
+    color: var(--gold-accent) !important;
+    font-size: 0.8em !important;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.stat-value {
+    font-family: 'Playfair Display', serif !important;
+    color: var(--dusty-rose) !important;
+    font-size: 2.2em !important;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+/* ========== 5. BUTTONS ========== */
+
+.btn-primary,
+.btn-start,
+.btn-name,
+.btn-start-game {
+    background: linear-gradient(135deg, #B88AAA 0%, #6F4E73 100%) !important;
+    color: var(--soft-cream) !important;
+    border: none !important;
+    font-weight: 600;
+    letter-spacing: 1px;
+    border-radius: 12px !important;
+    box-shadow: 0 8px 20px rgba(184, 138, 170, 0.34), 0 2px 8px rgba(0, 0, 0, 0.28);
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    position: relative;
+    overflow: hidden;
+    padding: 12px 24px !important;
+}
+
+.btn-primary::before,
+.btn-start::before,
+.btn-name::before,
+.btn-start-game::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: url('data:image/svg+xml;charset=utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><filter id="noise"><feTurbulence type="fractalNoise" baseFrequency="0.7" numOctaves="3" result="noise" /></filter><rect width="100" height="100" fill="white" filter="url(%23noise)" opacity="0.15"/></svg>');
+    background-repeat: repeat;
+    transition: left 0.6s ease;
+    pointer-events: none;
+}
+
+.btn-primary:hover,
+.btn-start:hover,
+.btn-name:hover,
+.btn-start-game:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 30px rgba(184, 138, 170, 0.48), 0 4px 12px rgba(0, 0, 0, 0.35);
+}
+
+.btn-primary:hover::before,
+.btn-start:hover::before,
+.btn-name:hover::before,
+.btn-start-game:hover::before {
+    left: 100%;
+}
+
+.btn-secondary,
+.btn-stop {
+    background: rgba(27, 31, 52, 0.78) !important;
+    color: var(--gold-accent) !important;
+    border: none !important;
+    border-radius: 12px !important;
+    font-weight: 600;
+    letter-spacing: 1px;
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.42), 0 2px 8px rgba(184, 154, 114, 0.18);
+    padding: 12px 24px !important;
+}
+
+.btn-secondary:hover,
+.btn-stop:hover {
+    background: rgba(184, 154, 114, 0.28) !important;
+    color: #E7D9C9 !important;
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.5), 0 4px 12px rgba(184, 138, 170, 0.26);
+    transform: translateY(-2px);
+}
+
+.btn-back {
+    background: rgba(217, 143, 181, 0.15) !important;
+    color: var(--gold-accent) !important;
+    border: none !important;
+    font-size: 1.2em !important;
+    padding: 8px 14px !important;
+    border-radius: 10px !important;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3), 0 2px 6px rgba(217, 143, 181, 0.2);
+}
+
+.btn-back:hover {
+    background: rgba(217, 143, 181, 0.25) !important;
+    color: var(--dusty-rose) !important;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4), 0 2px 8px rgba(217, 143, 181, 0.4);
+    transform: translateY(-1px);
+}
+
+/* ========== 6. PUZZLE BOARD ========== */
+
+.puzzle-container {
+    background: linear-gradient(145deg, rgba(20, 18, 36, 0.86) 0%, rgba(27, 31, 52, 0.86) 100%) !important;
+    border: none !important;
+    border-radius: 12px;
+    box-shadow:
+        0 0 44px rgba(184, 154, 114, 0.25),
+        0 15px 40px rgba(0, 0, 0, 0.62),
+        inset 0 0 30px rgba(184, 138, 170, 0.08);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 20px !important;
+    margin: 20px !important;
+}
+
+.puzzle-grid {
+    background: linear-gradient(135deg, rgba(12, 14, 28, 0.82) 0%, rgba(20, 18, 36, 0.82) 100%) !important;
+    border: 1px solid rgba(184, 154, 114, 0.22) !important;
+    gap: 6px !important;
+    padding: 12px !important;
+    border-radius: 1px;
+    width: 100%;
+    max-width: 500px;
+    aspect-ratio: 1;
+}
+
+.tile {
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    border: none !important;
+    border-radius: 1px;
+    color: var(--soft-cream) !important;
+    font-family: 'Playfair Display', serif;
+    font-size: 1.3em !important;
+    font-weight: 700;
+    box-shadow: 0 4px 12px rgba(217, 143, 181, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    
+    /* CRITICAL: Smooth, weighted motion */
+    transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), 
+                box-shadow 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    
+    cursor: grab;
+    user-select: none;
+}
+
+.tile:active:not(.empty) {
+    cursor: grabbing;
+    transform: scale(0.92) !important;
+    box-shadow: 0 2px 8px rgba(217, 143, 181, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.tile:hover:not(.empty) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(217, 143, 181, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.tile.empty {
+    background: transparent !important;
+    border: 1px dashed rgba(184, 154, 114, 0.56) !important;
+    box-shadow: inset 0 0 10px rgba(184, 154, 114, 0.14);
+    cursor: default;
+}
+
+.tile.solved {
+    background-image: linear-gradient(135deg, var(--gold-accent) 0%, #A08247 100%) !important;
+    background-size: auto;
+    box-shadow: 0 4px 15px rgba(201, 163, 93, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+/* ========== 7. MESSAGE & FEEDBACK ========== */
+
+.message {
+    color: var(--gold-accent) !important;
+    font-family: 'Playfair Display', serif !important;
+    font-size: 1.1em !important;
+    letter-spacing: 1px;
+    text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.5);
+}
+
+.message.success {
+    color: var(--dusty-rose) !important;
+    font-size: 1.3em !important;
+    text-shadow: 0 0 15px rgba(217, 143, 181, 0.4);
+}
+
+.message.error {
+    color: #E88BA8 !important;
+}
+
+.completion-badge {
+    background: linear-gradient(135deg, var(--gold-accent) 0%, var(--dusty-rose) 100%) !important;
+    color: var(--midnight-purple) !important;
+    border: 2px solid rgba(217, 143, 181, 0.3);
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    letter-spacing: 1px;
+    box-shadow: 0 8px 30px rgba(201, 163, 93, 0.4);
+    border-radius: 1px;
+}
+
+/* ========== 8. CONTROLS SECTION ========== */
+
+.controls {
+    background: linear-gradient(145deg, rgba(20, 18, 36, 0.82) 0%, rgba(27, 31, 52, 0.86) 100%) !important;
+    border: none !important;
+    border-radius: 12px !important;
+    padding: 15px !important;
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    align-items: center;
+    box-shadow:
+        0 8px 24px rgba(0, 0, 0, 0.42),
+        inset 0 0 20px rgba(184, 138, 170, 0.06);
+    flex-shrink: 0;
+}
+
+.controls .custom-select,
+.controls .difficulty-select {
+    grid-column: 1 / -1;
+    width: 100% !important;
+    max-width: none;
+}
+
+.controls .btn-primary,
+.controls .btn-secondary,
+.controls .btn-start-game,
+.controls .btn-stop {
+    width: 100%;
+    justify-content: center;
+}
+
+.difficulty-select {
+    background: linear-gradient(135deg, rgba(184, 138, 170, 0.22) 0%, rgba(184, 154, 114, 0.18) 100%) !important;
+    color: var(--soft-cream) !important;
+    border: none !important;
+    border-radius: 12px !important;
+    padding: 10px 16px !important;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow:
+        inset 0 0 16px rgba(184, 138, 170, 0.12),
+        0 8px 16px rgba(0, 0, 0, 0.42),
+        0 2px 6px rgba(184, 154, 114, 0.12);
+}
+
+.difficulty-select:hover {
+    background: linear-gradient(135deg, rgba(184, 138, 170, 0.32) 0%, rgba(184, 154, 114, 0.28) 100%) !important;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4), 0 2px 8px rgba(184, 138, 170, 0.24);
+    transform: translateY(-1px);
+}
+
+.difficulty-select:focus {
+    outline: none;
+    box-shadow: 0 0 20px rgba(217, 143, 181, 0.3);
+}
+
+/* ========== 9. LEADERBOARD ========== */
+
+.leaderboard-section {
+    background: linear-gradient(145deg, rgba(20, 18, 36, 0.82) 0%, rgba(27, 31, 52, 0.86) 100%) !important;
+    border: none !important;
+    border-radius: 12px !important;
+    box-shadow:
+        0 0 40px rgba(184, 154, 114, 0.15),
+        0 10px 30px rgba(0, 0, 0, 0.52),
+        inset 0 0 20px rgba(184, 138, 170, 0.06);
+    flex-shrink: 0;
+}
+
+/* Style native option list where possible */
+.difficulty-select option {
+    background-color: rgba(12, 14, 28, 0.98) !important;
+    color: var(--soft-cream) !important;
+    padding: 6px 8px !important;
+}
+
+.difficulty-select option:checked,
+.difficulty-select option[selected] {
+    background-color: rgba(124, 90, 121, 0.95) !important;
+    color: var(--soft-cream) !important;
+}
+
+/* Firefox fix so the selected text color is correct when focused */
+.difficulty-select:-moz-focusring { color: transparent; text-shadow: 0 0 0 var(--soft-cream); }
+
+/* Hide default arrow in IE/Edge */
+.difficulty-select::-ms-expand { display: none; }
+
+/* ========== CUSTOM SELECT (replacement for native dropdown) ========== */
+.custom-select {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+    max-width: 420px;
+}
+
+.custom-select__control {
+    background: linear-gradient(135deg, rgba(184, 138, 170, 0.22) 0%, rgba(184, 154, 114, 0.18) 100%) !important;
+    color: var(--soft-cream) !important;
+    border-radius: 12px !important;
+    padding: 10px 16px !important;
+    padding-right: 40px !important;
+    box-shadow: inset 0 0 12px rgba(184,138,170,0.08) !important, 0 8px 16px rgba(0,0,0,0.42) !important;
+    cursor: pointer !important;
+    user-select: none !important;
+}
+
+.custom-select__control:after {
+    content: '';
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 12px;
+    height: 12px;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 6"><path fill="%23EFE7DD" d="M0 0 L5 6 L10 0 Z"/></svg>');
+    background-size: 12px 12px;
+    pointer-events: none;
+}
+
+.custom-select__list {
+    position: absolute !important;
+    left: 0 !important;
+    right: 0 !important;
+    margin-top: 8px !important;
+    background: rgba(12,14,28,0.98) !important;
+    border-radius: 10px !important;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.6) !important;
+    z-index: 9999 !important;
+    max-height: 220px !important;
+    overflow: auto !important;
+}
+
+.custom-select__option {
+    padding: 10px 14px !important;
+    color: var(--soft-cream) !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+    background: transparent !important;
+}
+
+.custom-select__option:hover,
+.custom-select__option[aria-selected="true"] {
+    background: linear-gradient(135deg, rgba(124,90,121,0.95), rgba(124,90,121,0.95)) !important;
+    color: var(--soft-cream) !important;
+}
+
+/* Keep native select accessible but hidden off-screen */
+.difficulty-select.native-hidden {
+    position: absolute !important;
+    left: -9999px !important;
+    top: auto !important;
+    width: 1px !important;
+    height: 1px !important;
+    overflow: hidden !important;
+}
+
+.leaderboard-title {
+    color: var(--dusty-rose) !important;
+    font-family: 'Playfair Display', serif !important;
+    font-size: 1.3em !important;
+    letter-spacing: 2px;
+    text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.5);
+}
+
+.leaderboard-list {
+    background: rgba(15, 10, 21, 0.5) !important;
+    border: 1px solid rgba(184, 154, 114, 0.16) !important;
+    border-radius: 1px;
+}
+
+.leaderboard-entry {
+    background: rgba(26, 18, 33, 0.4);
+    border-bottom: 1px solid rgba(201, 163, 93, 0.1);
+    padding: 8px 12px !important;
+    transition: all 0.3s ease;
+}
+
+.leaderboard-entry:hover {
+    background: rgba(217, 143, 181, 0.1);
+}
+
+.leaderboard-entry:last-child {
+    border-bottom: none;
+}
+
+.empty-leaderboard {
+    color: var(--gold-accent) !important;
+    font-style: italic;
+}
+
+.name-input {
+    background: rgba(42, 31, 53, 0.6) !important;
+    color: var(--soft-cream) !important;
+    border: none !important;
+    border-radius: 10px !important;
+    padding: 10px 14px !important;
+    font-size: 0.9em;
+    transition: all 0.3s ease;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3), 0 2px 8px rgba(201, 163, 93, 0.15);
+}
+
+.name-input:focus {
+    outline: none;
+    background: rgba(42, 31, 53, 0.8) !important;
+    border-color: var(--dusty-rose) !important;
+    box-shadow: 0 0 15px rgba(217, 143, 181, 0.3);
+}
+
+.name-input::placeholder {
+    color: rgba(245, 241, 232, 0.5);
+}
+
+/* ========== 10. FEATURED ARTWORKS ========== */
+
+.film-item {
+    background: rgba(27, 31, 52, 0.72);
+    border: 2px solid rgba(184, 154, 114, 0.2);
+    border-radius: 1px;
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    cursor: pointer;
+    overflow: hidden;
+}
+
+.film-item:hover {
+    border-color: #B88AAA;
+    box-shadow: 0 0 20px rgba(184, 138, 170, 0.34);
+    transform: scale(1.05);
+}
+
+.film-artist {
+    background: rgba(15, 10, 21, 0.8);
+    color: var(--gold-accent);
+    font-size: 0.85em;
+    padding: 6px;
+}
+
+.artist-link {
+    color: var(--dusty-rose) !important;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    font-weight: 600;
+}
+
+.artist-link:hover {
+    color: var(--gold-accent) !important;
+}
+
+/* ========== 11. DARK MODE TOGGLE ========== */
+
+.dark-mode-toggle {
+    background: rgba(217, 143, 181, 0.15) !important;
+    border: none !important;
+    border-radius: 20px;
+    padding: 6px 2px !important;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3), 0 2px 6px rgba(217, 143, 181, 0.2);
+}
+
+.dark-mode-toggle:hover {
+    background: rgba(217, 143, 181, 0.25) !important;
+    box-shadow: 0 0 15px rgba(201, 163, 93, 0.2);
+}
+
+.toggle-track {
+    background: rgba(42, 31, 53, 0.8) !important;
+    border-radius: 20px;
+}
+
+.toggle-knob {
+    background: var(--gold-accent) !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.toggle-icon {
+    font-size: 0.9em;
+}
+
+/* ========== 12. ANIMATIONS & TRANSITIONS ========== */
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.message {
+    animation: slideIn 0.3s ease;
+}
+
+.completion-badge.show {
+    animation: slideIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ========== 13. KEYBOARD HINT ========== */
+
+.keyboard-hint {
+    color: rgba(245, 241, 232, 0.6) !important;
+    font-size: 0.85em;
+    letter-spacing: 0.5px;
+}
+
+/* ========== 14. RESPONSIVE ADJUSTMENTS ========== */
+
+@media (max-width: 600px) {
+    .start-title {
+        font-size: 2em !important;
+    }
+
+    .title {
+        font-size: 1.6em !important;
+    }
+
+    .stat-value {
+        font-size: 1.8em !important;
+    }
+
+    .tile {
+        font-size: 1em !important;
+    }
+}
+
+/* ========== 14. DARK MODE ========== */
+
+body.dark-mode .title {
+    color: var(--soft-cream) !important;
+    text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.8) !important;
+    -webkit-text-fill-color: var(--soft-cream) !important;
+    background: none !important;
+    -webkit-background-clip: unset !important;
+    background-clip: unset !important;
+}
+
+body.dark-mode .leaderboard-title {
+    color: var(--soft-cream) !important;
+    text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.5) !important;
+}
+
+body.dark-mode .front-page-leaderboard h3 {
+    color: var(--soft-cream) !important;
+    text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.5) !important;
+}
+
+body.dark-mode .start-title {
+    color: var(--soft-cream) !important;
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.6) !important;
+    -webkit-text-fill-color: var(--soft-cream) !important;
+    background: none !important;
+    -webkit-background-clip: unset !important;
+    background-clip: unset !important;
+}
+
+/* ========== 15. PRINT STYLES ========== */
+
+@media print {
+    body::before {
+        display: none;
+    }
+
+    .start-modal,
+    .container {
+        box-shadow: none;
+    }
+}

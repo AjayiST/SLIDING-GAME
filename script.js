@@ -138,92 +138,89 @@ function showConfirm(title, message) {
     });
 }
 
-// ===== DARK MODE =====
-function toggleDarkMode() {
-    document.body.classList.toggle('dark-mode');
-    const isDark = document.body.classList.contains('dark-mode');
-    localStorage.setItem('darkMode', isDark);
-    updateDarkModeToggleUI(isDark);
-}
+/* ===== Custom select replacement ===== */
+function createCustomSelect(selectEl) {
+    // wrapper
+    const wrapper = document.createElement('div');
+    wrapper.className = 'custom-select';
 
-function loadDarkMode() {
-    const isDark = localStorage.getItem('darkMode') === 'true';
-    if (isDark) {
-        document.body.classList.add('dark-mode');
-    } else {
-        document.body.classList.remove('dark-mode');
+    // control shown
+    const control = document.createElement('div');
+    control.className = 'custom-select__control';
+    control.tabIndex = 0;
+    wrapper.appendChild(control);
+
+    // options list
+    const list = document.createElement('div');
+    list.className = 'custom-select__list';
+    list.style.display = 'none';
+    wrapper.appendChild(list);
+
+    // populate
+    const options = Array.from(selectEl.querySelectorAll('option'));
+    function setValueFromOption(optEl) {
+        control.textContent = optEl.textContent;
+        options.forEach(o => o._li && o._li.removeAttribute('aria-selected'));
+        if (optEl._li) optEl._li.setAttribute('aria-selected', 'true');
+        selectEl.value = optEl.value;
+        // dispatch change
+        const ev = new Event('change', { bubbles: true });
+        selectEl.dispatchEvent(ev);
     }
-    // Sync the toggle UI
-    updateDarkModeToggleUI(isDark);
-}
 
-function updateDarkModeToggleUI(isDark) {
-    const toggles = Array.from(document.querySelectorAll('.dark-mode-toggle'));
-    if (!toggles.length) return;
-    toggles.forEach(btn => {
-        if (isDark) {
-            btn.classList.add('on');
-            btn.setAttribute('aria-pressed', 'true');
-            btn.setAttribute('title', 'Switch to light mode');
-            btn.setAttribute('aria-label', 'Switch to light mode');
-        } else {
-            btn.classList.remove('on');
-            btn.setAttribute('aria-pressed', 'false');
-            btn.setAttribute('title', 'Switch to dark mode');
-            btn.setAttribute('aria-label', 'Switch to dark mode');
-        }
+    options.forEach(opt => {
+        const li = document.createElement('div');
+        li.className = 'custom-select__option';
+        li.textContent = opt.textContent;
+        li.tabIndex = 0;
+        li.addEventListener('click', () => {
+            setValueFromOption(opt);
+            list.style.display = 'none';
+        });
+        li.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); li.click(); }
+        });
+        opt._li = li;
+        list.appendChild(li);
     });
-}
 
-// Move the single toggle element into a parent frame (start modal or game container)
-function placeToggleIn(selector) {
-    const toggle = document.getElementById('darkModeToggle');
-    if (!toggle) return;
-    const parent = document.querySelector(selector);
-    if (parent) {
-        // append into the target frame and apply in-frame styling
-        parent.appendChild(toggle);
-        toggle.classList.add('in-frame');
-        // ensure parent won't clip the toggle
-        try { parent.style.overflow = 'visible'; } catch (e) {}
-        // remove any inline overrides so CSS classes control appearance
-        ['position','top','right','left','zIndex','display','alignItems','justifyContent','background','border','boxShadow','width','height','color','outline'].forEach(prop => { try { toggle.style[prop] = ''; } catch(e){} });
-        // If it's not visible in the viewport (rare), fallback to fixed placement
-        try {
-            const rect = toggle.getBoundingClientRect();
-            const vw = window.innerWidth || document.documentElement.clientWidth;
-            const vh = window.innerHeight || document.documentElement.clientHeight;
-            const visible = rect.width > 0 && rect.height > 0 && rect.bottom >= 0 && rect.right >= 0 && rect.left <= vw && rect.top <= vh;
-            if (!visible) {
-                placeToggleFixed();
-                showToast('Toggle repositioned to top-right for visibility', 'info');
-            }
-        } catch (e) {}
-    } else {
-        // fallback: attach to body (fixed behavior)
-        document.body.appendChild(toggle);
-        toggle.classList.remove('in-frame');
-        // clear inline overrides so CSS handles fixed placement
-        ['position','top','right','left','zIndex','display','background','border','boxShadow'].forEach(prop => { try { toggle.style[prop] = ''; } catch(e){} });
+    // initial value
+    const selected = selectEl.querySelector('option:checked') || options[0];
+    if (selected) setValueFromOption(selected);
+
+    // interactions
+    function toggleList() {
+        list.style.display = (list.style.display === 'none') ? 'block' : 'none';
     }
+    control.addEventListener('click', toggleList);
+    control.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleList(); }
+        if (e.key === 'ArrowDown') { e.preventDefault(); list.style.display='block'; list.querySelector('.custom-select__option')?.focus(); }
+    });
+
+    // close on outside click
+    document.addEventListener('click', (e) => {
+        if (!wrapper.contains(e.target)) list.style.display = 'none';
+    });
+
+    // insert wrapper before select and hide native select
+    selectEl.parentNode.insertBefore(wrapper, selectEl);
+    selectEl.classList.add('native-hidden');
 }
 
-function placeToggleFixed() {
-    const toggle = document.getElementById('darkModeToggle');
-    if (!toggle) return;
-    document.body.appendChild(toggle);
-    toggle.classList.remove('in-frame');
-    // Clear inline styles so the default CSS `dark-mode-toggle` fixed placement applies
-    ['position','top','right','left','zIndex'].forEach(prop => { try { toggle.style[prop] = ''; } catch(e){} });
+function initCustomSelects() {
+    const selects = Array.from(document.querySelectorAll('.difficulty-select'));
+    selects.forEach(s => {
+        // avoid double-init
+        if (s._customInited) return;
+        try { createCustomSelect(s); s._customInited = true; } catch (e) { console.warn('custom select init failed', e); }
+    });
 }
 
 // ===== START SCREEN =====
 function goToGame() {
     document.getElementById('startScreen').classList.add('hidden');
     document.getElementById('gameContainer').style.display = 'block';
-    // place the single toggle inside the header near the back button
-    // run slightly after layout to avoid race conditions where the header is reflowing
-    setTimeout(() => placeToggleIn('.header'), 60);
     getRandomArt();
     loadImageAndInit();
 }
@@ -496,8 +493,6 @@ async function stopGame() {
     clearInterval(timerInterval);
     document.getElementById('startScreen').classList.remove('hidden');
     document.getElementById('gameContainer').style.display = 'none';
-    // move the single toggle back into the start modal frame
-    placeToggleIn('.start-modal');
 
     // Reset game state
     isGameStarted = false;
@@ -561,7 +556,7 @@ function generateScoreCard() {
             // Watermark
             ctx.font = '14px Arial';
             ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
-            ctx.fillText('Frame Puzzle - NFT Community', 300, 370);
+            ctx.fillText('Beaks', 300, 370);
             
             resolve(canvas.toDataURL('image/png'));
         };
@@ -596,7 +591,7 @@ function generateScoreCard() {
             // Watermark
             ctx.font = '14px Arial';
             ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
-            ctx.fillText('Frame Puzzle - NFT Community', 300, 370);
+            ctx.fillText('Beaks', 300, 370);
             
             resolve(canvas.toDataURL('image/png'));
         };
@@ -605,11 +600,10 @@ function generateScoreCard() {
 }
 
 // Initialize
-loadDarkMode();
 document.getElementById('bestMoves').textContent = bestMoves;
 displayArtGallery();
-// Place toggle inside the start modal by default
-placeToggleIn('.start-modal');
+// initialize custom selects (replace native dropdown with themed list)
+initCustomSelects();
 
 // ===== LEADERBOARD =====
 function loadLeaderboard() {
@@ -720,7 +714,7 @@ function toggleXPostOptions(username, moves) {
 }
 
 function generateXPostOptions(username, moves) {
-    const postText = `🎨 Just crushed the NFT Frame Puzzle Challenge! 🏆\n\nMoves: ${moves}\nUsername: ${username}\n\nCan you beat my score? Join the community leaderboard now! 🚀\n\n#NFT #GameFi #PuzzleChallenge #NFTCommunity`;
+    const postText = `🎨 Just crushed the Beaks challenge! 🏆\n\nMoves: ${moves}\nUsername: ${username}\n\nCan you beat my score? Join the leaderboard now! 🚀\n\n#Beaks #GameFi #PuzzleChallenge`;
     
     const optionsDiv = document.getElementById('xPostOptions');
     optionsDiv.innerHTML = `
@@ -739,14 +733,14 @@ function generateXPostOptions(username, moves) {
 
 // ===== X POST GENERATION & SHARING =====
 function shareToX(text) {
-    const postText = text || window.currentXPost || 'I just beat the NFT Frame Puzzle Challenge!';
+    const postText = text || window.currentXPost || 'I just beat the Beaks challenge!';
     const encodedText = encodeURIComponent(postText);
     const xUrl = `https://twitter.com/intent/tweet?text=${encodedText}`;
     window.open(xUrl, '_blank');
 }
 
 function copyPostToClipboard(text) {
-    const postText = text || window.currentXPost || 'I just beat the NFT Frame Puzzle Challenge!';
+    const postText = text || window.currentXPost || 'I just beat the Beaks challenge!';
     navigator.clipboard.writeText(postText).then(() => {
         showToast('✅ Post copied to clipboard! Ready to share on X', 'success');
     }).catch(() => {
@@ -1063,8 +1057,5 @@ function shuffleAndStart() {
 // ===== EVENT LISTENERS & INIT =====
 window.addEventListener('keydown', handleKeyPress);
 loadLeaderboard();
-loadDarkMode();
 document.getElementById('bestMoves').textContent = bestMoves;
 displayArtGallery();
-// Place toggle inside the start modal by default
-placeToggleIn('.start-modal');

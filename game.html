@@ -3,9 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🎨 Frame Puzzle - NFT Community</title>
+    <title>Beaks</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="beaks-theme.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="background"></div>
@@ -15,16 +17,9 @@
     <!-- Start Screen -->
     <div class="start-screen" id="startScreen">
         <div class="start-modal">
-            <div class="start-title">🎨 FRAME PUZZLE</div>
-                <button id="darkModeToggle" class="dark-mode-toggle" onclick="toggleDarkMode()" aria-pressed="false" aria-label="Toggle dark mode" title="Toggle dark mode">
-                    <span class="toggle-track" aria-hidden="true">
-                        <span class="toggle-icon sun">☀️</span>
-                        <span class="toggle-icon moon">🌙</span>
-                        <span class="toggle-knob" aria-hidden="true"></span>
-                    </span>
-                </button>
-            <div class="start-subtitle">NFT Community Challenge</div>
-            <p class="start-description">Solve beautiful NFT frame puzzles and climb the leaderboard!</p>
+            <div class="start-title">BEAKS</div>
+            <div class="start-subtitle">Surrealist Puzzle Challenge</div>
+            <p class="start-description">Solve the Beaks frame puzzles and climb the leaderboard!</p>
             
             <!-- Leaderboard Section on Front Page -->
             <div class="front-page-leaderboard">
@@ -39,15 +34,12 @@
             
             <!-- Art Gallery -->
             <div class="art-gallery" id="artGallery"></div>
-            
-            <p class="start-footer">👇 Click an artwork to begin →</p>
         </div>
     </div>
     
     <div class="container" id="gameContainer" style="display: none;">
-            <div class="header">            <button class="btn-back" onclick="stopGame()" aria-label="Back" title="Back to home">←</button>            <div class="title">🎨 FRAME PUZZLE</div>
-                <!-- dark-mode toggle is a single movable element (re-parented by JS) --> 
-            <div class="subtitle">NFT Community Challenge</div>
+            <div class="header">            <button class="btn-back" onclick="stopGame()" aria-label="Back" title="Back to home">←</button>            <div class="title">BEAKS</div>
+            <div class="subtitle">Surrealist Puzzle Challenge</div>
             <div class="art-indicator" id="artIndicator">🎲 Ready to play</div>
         </div>
 
