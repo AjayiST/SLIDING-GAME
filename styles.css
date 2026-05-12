@@ -389,6 +389,8 @@ body {
     margin: 6px 0 4px 0;
     max-height: 130px;
     overflow: hidden;
+    content-visibility: auto;
+    contain-intrinsic-size: 130px;
 }
 
 .gallery-title {

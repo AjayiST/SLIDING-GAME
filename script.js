@@ -296,7 +296,7 @@ function displayArtGallery() {
     // Render a continuously-scrolling film-strip of artworks (duplicated for seamless loop)
     const items = NFT_ART_COLLECTION.map((art, idx) => `
         <div class="film-item" role="listitem" tabindex="0" aria-label="Artwork ${idx + 1} by ${art.artist}" onclick="selectArt(${idx})" onkeydown="if(event.key === 'Enter' || event.key === ' ' || event.key === 'Spacebar'){ selectArt(${idx}); }">
-            <img src="${encodeURI(art.path)}" alt="Art ${idx + 1}" class="film-img">
+            <img src="${encodeURI(art.path)}" alt="Art ${idx + 1}" class="film-img" loading="lazy" decoding="async" fetchpriority="low">
             <div class="film-artist"><a href="${art.link}" target="_blank" class="artist-link" onclick="event.stopPropagation()">By ${art.artist} →</a></div>
         </div>
     `).join('');
@@ -313,6 +313,20 @@ function displayArtGallery() {
 
     // Initialize JS-driven film strip animation (pixel-perfect, continuous)
     setupFilmStrip();
+}
+
+function scheduleArtGallery() {
+    const run = () => {
+        const gallery = document.getElementById('artGallery');
+        if (!gallery || gallery.children.length > 0) return;
+        displayArtGallery();
+    };
+
+    if ('requestIdleCallback' in window) {
+        window.requestIdleCallback(run, { timeout: 1500 });
+    } else {
+        setTimeout(run, 300);
+    }
 }
 
 // ===== Film-strip continuous animation (JS driven) =====
@@ -500,7 +514,7 @@ async function stopGame() {
     lastGameMoves = 0;
     pausedElapsed = 0; // Reset pausedElapsed when stopping the session
 
-    displayArtGallery();
+    scheduleArtGallery();
     displayFrontPageLeaderboard();
 }
 
@@ -601,7 +615,7 @@ function generateScoreCard() {
 
 // Initialize
 document.getElementById('bestMoves').textContent = bestMoves;
-displayArtGallery();
+scheduleArtGallery();
 // initialize custom selects (replace native dropdown with themed list)
 initCustomSelects();
 
@@ -1058,4 +1072,4 @@ function shuffleAndStart() {
 window.addEventListener('keydown', handleKeyPress);
 loadLeaderboard();
 document.getElementById('bestMoves').textContent = bestMoves;
-displayArtGallery();
+scheduleArtGallery();
