@@ -394,12 +394,21 @@ function displayArtGallery() {
     if (!gallery) return;
     
     // Create items for 3x3 grid with continuous loop (duplicate 4 times for seamless scrolling)
-    const items = NFT_ART_COLLECTION.map((art, idx) => `
-        <div class="gallery-item" role="listitem" tabindex="0" aria-label="Artwork ${idx + 1} by ${art.artist}" onclick="selectArt(${idx})" onkeydown="if(event.key === 'Enter' || event.key === ' ' || event.key === 'Spacebar'){ selectArt(${idx}); }">
-            <img src="${encodeURI(art.path)}" alt="Art ${idx + 1}" class="gallery-img" loading="lazy" decoding="async" fetchpriority="low">
-            <div class="gallery-artist"><a href="${art.link}" target="_blank" class="artist-link" onclick="event.stopPropagation()">By ${art.artist} →</a></div>
-        </div>
-    `).join('');
+    const items = NFT_ART_COLLECTION.map((art, idx) => {
+        // Extract artist handle from X entry link to create artist account link
+        const handleMatch = art.link.match(/x\.com\/([^\/]+)/);
+        const artistHandle = handleMatch ? handleMatch[1] : '';
+        const artistAccountLink = artistHandle ? `https://x.com/${artistHandle}` : art.link;
+        
+        return `
+            <div class="gallery-item" role="listitem" tabindex="0" aria-label="Artwork ${idx + 1} by ${art.artist}">
+                <a href="${art.link}" target="_blank" class="gallery-img-link" onclick="event.stopPropagation()">
+                    <img src="${encodeURI(art.path)}" alt="Art ${idx + 1}" class="gallery-img" loading="lazy" decoding="async" fetchpriority="low">
+                </a>
+                <div class="gallery-artist"><a href="${artistAccountLink}" target="_blank" class="artist-link" onclick="event.stopPropagation()">By ${art.artist} →</a></div>
+            </div>
+        `;
+    }).join('');
 
     gallery.innerHTML = `
         <div class="gallery-title">✨ Featured Artworks ✨</div>

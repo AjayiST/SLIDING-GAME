@@ -507,6 +507,19 @@ body {
     display: block;
 }
 
+.gallery-img-link {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 25%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    cursor: pointer;
+}
+
 .gallery-artist {
     position: absolute;
     bottom: 0;
