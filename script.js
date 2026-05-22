@@ -1,15 +1,15 @@
 // 🎨 ALL YOUR NFT ARTWORKS WITH ARTIST INFO
 const NFT_ART_COLLECTION = [
-    { path: 'assets/nft-art/Beebs.jpg', artist: 'Beebs', link: '#' },
-    { path: 'assets/nft-art/Bigmykel.jpg', artist: 'Bigmykel', link: '#' },
-    { path: 'assets/nft-art/danii.jpg', artist: 'danii', link: '#' },
-    { path: 'assets/nft-art/ebby.jpg', artist: 'ebby', link: '#' },
-    { path: 'assets/nft-art/Jinxlockin.jpg', artist: 'Jinxlockin', link: '#' },
-    { path: 'assets/nft-art/Marvolo.jpg', artist: 'Marvolo', link: '#' },
-    { path: 'assets/nft-art/OG.jpg', artist: 'OG', link: '#' },
-    { path: 'assets/nft-art/Oluwaseun.jpg', artist: 'Oluwaseun', link: '#' },
-    { path: 'assets/nft-art/playgirl.jpg', artist: 'playgirl', link: '#' },
-    { path: 'assets/nft-art/screwysanta.jpg', artist: 'screwysanta', link: '#' },
+    { path: 'assets/nft-art/Beebs.jpg', artist: 'Beebs', link: 'https://x.com/Beebs1S/status/2055042879400095775?s=20' },
+    { path: 'assets/nft-art/Bigmykel.jpg', artist: 'Bigmykel', link: 'https://x.com/Bigmykel1/status/2056226804638126531?s=20' },
+    { path: 'assets/nft-art/danii.jpg', artist: 'danii', link: 'https://x.com/DaniiOnChain/status/2055296178275631120?s=20' },
+    { path: 'assets/nft-art/ebby.jpg', artist: 'ebby', link: 'https://x.com/savage22446688/status/2056109953723613233?s=20' },
+    { path: 'assets/nft-art/Jinxlockin.jpg', artist: 'Jinxlockin', link: 'https://x.com/JinxLockIn/status/2055243485972983956?s=20' },
+    { path: 'assets/nft-art/Marvolo.jpg', artist: 'Marvolo', link: 'https://x.com/marvoloart/status/2056218801562353921?s=20' },
+    { path: 'assets/nft-art/OG.jpg', artist: 'OG', link: 'https://x.com/gmerboypf/status/2056139435649953985?s=20' },
+    { path: 'assets/nft-art/Oluwaseun.jpg', artist: 'Oluwaseun', link: 'https://x.com/mayomiposimi/status/2056169965758058818?s=20' },
+    { path: 'assets/nft-art/playgirl.jpg', artist: 'playgirl', link: 'https://x.com/Play_girl045/status/2056101670208061659?s=20' },
+    { path: 'assets/nft-art/screwysanta.jpg', artist: 'screwysanta', link: 'https://x.com/screwysanta0447/status/2055659344801255759?s=20' },
 ];
 
 // ===== UUID/Player Identification =====
@@ -44,6 +44,7 @@ let currentArtPath = null;
 let bestMoves = localStorage.getItem('bestMoves') || '-';
 let leaderboard = [];
 let lastGameMoves = 0;
+let lastGameTime = 0;
 let pausedElapsed = 0; // milliseconds paused
 let loadingHideTimer = null;
 let loadingPulseTimer = null;
@@ -656,7 +657,12 @@ function displayLeaderboard() {
         return;
     }
 
-    const sorted = [...leaderboard].sort((a, b) => a.moves - b.moves).slice(0, 10);
+    // Sort by Speed Score (highest first, which means best efficiency)
+    const sorted = [...leaderboard].sort((a, b) => {
+        const scoreA = a.speedScore || (a.moves / a.time);
+        const scoreB = b.speedScore || (b.moves / b.time);
+        return scoreB - scoreA;
+    }).slice(0, 10);
     
     listContainer.innerHTML = sorted.map((entry, index) => {
         let rankClass = '';
@@ -675,6 +681,8 @@ function displayLeaderboard() {
             rankEmoji = `#${index + 1}`;
         }
         
+        const speedScore = entry.speedScore || (entry.moves / entry.time);
+        const percentageScore = (speedScore * 100).toFixed(2);
         const shortID = entry.playerID ? entry.playerID.substring(0, 8) : 'N/A';
         const isCurrentPlayer = entry.playerID === currentPlayerID ? '👤' : '';
 
@@ -682,7 +690,7 @@ function displayLeaderboard() {
             <div class="leaderboard-item">
                 <div class="leaderboard-rank ${rankClass}">${rankEmoji}</div>
                 <div class="leaderboard-name">${entry.name} ${isCurrentPlayer}</div>
-                <div class="leaderboard-score">${entry.moves} moves</div>
+                <div class="leaderboard-score">${percentageScore}%</div>
                 <div class="leaderboard-id" title="${entry.playerID}">${shortID}</div>
             </div>
         `;
@@ -701,9 +709,14 @@ async function submitScore() {
         return;
     }
 
+    // Calculate Speed Score: Moves / Time (in seconds)
+    const speedScore = lastGameTime > 0 ? (lastGameMoves / lastGameTime).toFixed(4) : 0;
+
     leaderboard.push({
         name: playerName.substring(0, 20),
         moves: lastGameMoves,
+        time: lastGameTime,
+        speedScore: parseFloat(speedScore),
         date: new Date().toLocaleDateString(),
         playerID: currentPlayerID
     });
@@ -997,11 +1010,13 @@ function checkWin() {
         document.getElementById('message').innerHTML = '🎉 PUZZLE SOLVED! 🎉';
         document.getElementById('message').className = 'message success';
         
-        const minutes = Math.floor((Date.now() - startTime) / 60000);
-        const seconds = Math.floor(((Date.now() - startTime) % 60000) / 1000);
+        const elapsed = Date.now() - startTime;
+        const minutes = Math.floor(elapsed / 60000);
+        const seconds = Math.floor((elapsed % 60000) / 1000);
         const timeStr = `${minutes}:${String(seconds).padStart(2, '0')}`;
         
         lastGameMoves = moveCount;
+        lastGameTime = Math.floor(elapsed / 1000); // Store time in seconds
         
         if (bestMoves === '-' || moveCount < parseInt(bestMoves)) {
             bestMoves = moveCount;
