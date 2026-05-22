@@ -138,7 +138,7 @@ body::after {
 }
 
 .start-title {
-    font-family: 'Playfair Display', serif !important;
+    font-family: 'Londrina Shadow', serif !important;
     color: #D8B8C8 !important;
     font-size: 3em !important;
     font-weight: 700 !important;
@@ -167,7 +167,6 @@ body::after {
 
 .front-page-leaderboard h3 {
     color: #D3B0C3 !important;
-    font-family: 'Playfair Display', serif !important;
     font-size: 1.2em !important;
     letter-spacing: 2px;
     text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.5);
@@ -185,7 +184,7 @@ body::after {
 }
 
 .title {
-    font-family: 'Playfair Display', serif !important;
+    font-family: 'Londrina Shadow', serif !important;
     color: #D8B8C8 !important;
     font-size: 2.2em !important;
     letter-spacing: 2px;
@@ -214,6 +213,7 @@ body::after {
 }
 
 .gallery-title {
+    font-family: 'Inter', sans-serif !important;
     color: #D3B0C3 !important;
     letter-spacing: 0.8px;
     text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.45);
@@ -238,7 +238,7 @@ body::after {
 }
 
 .stat-value {
-    font-family: 'Playfair Display', serif !important;
+    font-family: 'Londrina Shadow', serif !important;
     color: var(--dusty-rose) !important;
     font-size: 2.2em !important;
     font-weight: 700;
@@ -371,7 +371,7 @@ body::after {
     border: none !important;
     border-radius: 1px;
     color: var(--soft-cream) !important;
-    font-family: 'Playfair Display', serif;
+    font-family: 'Inter', sans-serif;
     font-size: 1.3em !important;
     font-weight: 700;
     box-shadow: 0 4px 12px rgba(217, 143, 181, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2);
@@ -413,7 +413,7 @@ body::after {
 
 .message {
     color: var(--gold-accent) !important;
-    font-family: 'Playfair Display', serif !important;
+    font-family: 'Inter', sans-serif !important;
     font-size: 1.1em !important;
     letter-spacing: 1px;
     text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.5);
@@ -433,7 +433,7 @@ body::after {
     background: linear-gradient(135deg, var(--gold-accent) 0%, var(--dusty-rose) 100%) !important;
     color: var(--midnight-purple) !important;
     border: 2px solid rgba(217, 143, 181, 0.3);
-    font-family: 'Playfair Display', serif;
+    font-family: 'Londrina Shadow', serif;
     font-weight: 700;
     letter-spacing: 1px;
     box-shadow: 0 8px 30px rgba(201, 163, 93, 0.4);
@@ -601,7 +601,7 @@ body::after {
 
 .leaderboard-title {
     color: var(--dusty-rose) !important;
-    font-family: 'Playfair Display', serif !important;
+    font-family: 'Londrina Shadow', serif !important;
     font-size: 1.3em !important;
     letter-spacing: 2px;
     text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.5);

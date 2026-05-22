@@ -4,12 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Beaks</title>
-    <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="beaks-theme.css">
+    <link rel="stylesheet" href="styles.css?v=3">
+    <link rel="stylesheet" href="beaks-theme.css?v=3">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Londrina+Shadow&family=Pinyon+Script&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="background"></div>
@@ -19,28 +19,31 @@
     <!-- Start Screen -->
     <div class="start-screen" id="startScreen">
         <div class="start-modal">
-            <div class="start-title">BEAKS</div>
+            <div class="title-lockup start-title-lockup" aria-label="Beaks title">
+                <span class="title-ornament title-ornament-left" aria-hidden="true"></span>
+                <div class="start-title">BEAKS</div>
+                <span class="title-ornament title-ornament-right" aria-hidden="true"></span>
+            </div>
             <div class="start-subtitle">Surrealist Puzzle Challenge</div>
             <p class="start-description">Solve the Beaks frame puzzles and climb the leaderboard!</p>
             
-            <!-- Leaderboard Section on Front Page -->
-            <div class="front-page-leaderboard">
-                <h3>🏆 Top Players 🏆</h3>
-                <div class="leaderboard-list-front" id="leaderboardListFront"></div>
-            </div>
+            <!-- Art Gallery -->
+            <div class="art-gallery" id="artGallery"></div>
             
             <!-- Action Buttons -->
             <div class="front-page-buttons">
                 <button class="btn-start" onclick="goToGame()" aria-label="Continue to game" title="Continue to game">▶️ Continue to Game</button>
             </div>
-            
-            <!-- Art Gallery -->
-            <div class="art-gallery" id="artGallery"></div>
         </div>
     </div>
     
     <div class="container" id="gameContainer" style="display: none;">
-            <div class="header">            <button class="btn-back" onclick="stopGame()" aria-label="Back" title="Back to home">←</button>            <div class="title">BEAKS</div>
+            <div class="header">            <button class="btn-back" onclick="stopGame()" aria-label="Back" title="Back to home">←</button>
+            <div class="title-lockup header-title-lockup" aria-label="Beaks title">
+                <span class="title-ornament title-ornament-left" aria-hidden="true"></span>
+                <div class="title">BEAKS</div>
+                <span class="title-ornament title-ornament-right" aria-hidden="true"></span>
+            </div>
             <div class="subtitle">Surrealist Puzzle Challenge</div>
             <div class="art-indicator" id="artIndicator">🎲 Ready to play</div>
         </div>
@@ -67,9 +70,9 @@
                 <option value="5">5×5 (Hard)</option>
             </select>
             <button class="btn-primary" onclick="shufflePuzzle()">🔀 SHUFFLE</button>
-            <button class="btn-secondary" onclick="resetGame()">🔄 RESET</button>
-            <button class="btn-start-game" onclick="startTimer()">▶️ START</button>
-            <button class="btn-stop" onclick="pauseGame()">⏹️ STOP</button>
+            <button class="btn-secondary" onclick="resetGame()">↩️ RESET</button>
+            <button class="btn-start-game" onclick="startTimer()">🟢 START</button>
+            <button class="btn-stop" onclick="pauseGame()">🛑 STOP</button>
         </div>
 
         <div class="puzzle-container">
@@ -120,6 +123,6 @@
     <div id="modalRoot"></div>
     <div id="toastRoot" aria-live="polite" aria-atomic="true"></div>
 
-    <script src="script.js"></script>
+    <script src="script.js?v=3"></script>
 </body>
 </html>

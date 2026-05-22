@@ -1,13 +1,34 @@
 // 🎨 ALL YOUR NFT ARTWORKS WITH ARTIST INFO
 const NFT_ART_COLLECTION = [
-    { path: 'assets/nft-art/frame 1.png', artist: 'Frame Labs', link: '#' },
-    { path: 'assets/nft-art/frame 2.png', artist: 'Frame Labs', link: '#' },
-    { path: 'assets/nft-art/frame 3.png', artist: 'Frame Labs', link: '#' },
-    { path: 'assets/nft-art/frame 4.png', artist: 'Frame Labs', link: '#' },
-    { path: 'assets/nft-art/frame 5.jpg', artist: 'Frame Labs', link: '#' },
-    { path: 'assets/nft-art/frame 6.jpg', artist: 'Frame Labs', link: '#' },
-    { path: 'assets/nft-art/frame 7.jpg', artist: 'Frame Labs', link: '#' },
+    { path: 'assets/nft-art/Beebs.jpg', artist: 'Beebs', link: '#' },
+    { path: 'assets/nft-art/Bigmykel.jpg', artist: 'Bigmykel', link: '#' },
+    { path: 'assets/nft-art/danii.jpg', artist: 'danii', link: '#' },
+    { path: 'assets/nft-art/ebby.jpg', artist: 'ebby', link: '#' },
+    { path: 'assets/nft-art/Jinxlockin.jpg', artist: 'Jinxlockin', link: '#' },
+    { path: 'assets/nft-art/Marvolo.jpg', artist: 'Marvolo', link: '#' },
+    { path: 'assets/nft-art/OG.jpg', artist: 'OG', link: '#' },
+    { path: 'assets/nft-art/Oluwaseun.jpg', artist: 'Oluwaseun', link: '#' },
+    { path: 'assets/nft-art/playgirl.jpg', artist: 'playgirl', link: '#' },
+    { path: 'assets/nft-art/screwysanta.jpg', artist: 'screwysanta', link: '#' },
 ];
+
+// ===== UUID/Player Identification =====
+function generateUUID() {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        const r = Math.random() * 16 | 0;
+        const v = c === 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+    });
+}
+
+function getOrCreatePlayerID() {
+    let playerID = localStorage.getItem('playerID');
+    if (!playerID) {
+        playerID = generateUUID();
+        localStorage.setItem('playerID', playerID);
+    }
+    return playerID;
+}
 
 let gridSize = 4;
 let tiles = [];
@@ -24,6 +45,10 @@ let bestMoves = localStorage.getItem('bestMoves') || '-';
 let leaderboard = [];
 let lastGameMoves = 0;
 let pausedElapsed = 0; // milliseconds paused
+let loadingHideTimer = null;
+let loadingPulseTimer = null;
+let currentLoadingPercent = 0;
+let currentPlayerID = getOrCreatePlayerID();
 
 // ===== UI Helpers: Toasts & Confirm Modals =====
 function showToast(message, type = 'info', timeout = 3000) {
@@ -53,6 +78,79 @@ function showToast(message, type = 'info', timeout = 3000) {
     };
 
     setTimeout(removeToast, timeout);
+}
+
+function updateProgress(percent) {
+    const loadingScreen = document.getElementById('loading-screen');
+    const progressBar = document.getElementById('progress-bar-container');
+    const progressFill = document.getElementById('progress-fill');
+    const ostrichRunner = document.getElementById('ostrich-runner');
+
+    if (!loadingScreen || !progressBar || !progressFill || !ostrichRunner) return;
+
+    currentLoadingPercent = Math.max(0, Math.min(100, Number(percent) || 0));
+
+    if (loadingHideTimer) {
+        clearTimeout(loadingHideTimer);
+        loadingHideTimer = null;
+    }
+
+    if (loadingPulseTimer && currentLoadingPercent >= 100) {
+        clearInterval(loadingPulseTimer);
+        loadingPulseTimer = null;
+    }
+
+    if (currentLoadingPercent < 100) {
+        loadingScreen.classList.remove('is-complete');
+        loadingScreen.classList.add('is-visible');
+        loadingScreen.style.display = 'flex';
+    }
+
+    progressFill.style.width = `${currentLoadingPercent}%`;
+
+    const barWidth = progressBar.clientWidth;
+    const runnerWidth = ostrichRunner.offsetWidth || 0;
+    const travelWidth = Math.max(barWidth - runnerWidth, 0);
+    const left = travelWidth * (currentLoadingPercent / 100);
+
+    ostrichRunner.style.left = `${left}px`;
+
+    if (currentLoadingPercent >= 100) {
+        loadingScreen.classList.add('is-complete');
+        loadingHideTimer = window.setTimeout(() => {
+            loadingScreen.classList.remove('is-visible');
+            loadingScreen.style.display = 'none';
+        }, 450);
+    }
+}
+
+function beginLoadingOverlay() {
+    const loadingScreen = document.getElementById('loading-screen');
+    if (!loadingScreen) return;
+
+    loadingScreen.classList.remove('is-complete');
+    loadingScreen.classList.add('is-visible');
+    loadingScreen.style.display = 'flex';
+
+    updateProgress(0);
+
+    if (loadingPulseTimer) {
+        clearInterval(loadingPulseTimer);
+    }
+
+    let simulated = 0;
+    loadingPulseTimer = setInterval(() => {
+        simulated = Math.min(simulated + (simulated < 35 ? 9 : simulated < 75 ? 5 : 2), 92);
+        updateProgress(simulated);
+    }, 120);
+}
+
+function endLoadingOverlay() {
+    if (loadingPulseTimer) {
+        clearInterval(loadingPulseTimer);
+        loadingPulseTimer = null;
+    }
+    updateProgress(100);
 }
 
 function showConfirm(title, message) {
@@ -293,26 +391,21 @@ function pauseGame() {
 function displayArtGallery() {
     const gallery = document.getElementById('artGallery');
     if (!gallery) return;
-    // Render a continuously-scrolling film-strip of artworks (duplicated for seamless loop)
+    
+    // Create items for 3x3 grid with continuous loop (duplicate 4 times for seamless scrolling)
     const items = NFT_ART_COLLECTION.map((art, idx) => `
-        <div class="film-item" role="listitem" tabindex="0" aria-label="Artwork ${idx + 1} by ${art.artist}" onclick="selectArt(${idx})" onkeydown="if(event.key === 'Enter' || event.key === ' ' || event.key === 'Spacebar'){ selectArt(${idx}); }">
-            <img src="${encodeURI(art.path)}" alt="Art ${idx + 1}" class="film-img" loading="lazy" decoding="async" fetchpriority="low">
-            <div class="film-artist"><a href="${art.link}" target="_blank" class="artist-link" onclick="event.stopPropagation()">By ${art.artist} →</a></div>
+        <div class="gallery-item" role="listitem" tabindex="0" aria-label="Artwork ${idx + 1} by ${art.artist}" onclick="selectArt(${idx})" onkeydown="if(event.key === 'Enter' || event.key === ' ' || event.key === 'Spacebar'){ selectArt(${idx}); }">
+            <img src="${encodeURI(art.path)}" alt="Art ${idx + 1}" class="gallery-img" loading="lazy" decoding="async" fetchpriority="low">
+            <div class="gallery-artist"><a href="${art.link}" target="_blank" class="artist-link" onclick="event.stopPropagation()">By ${art.artist} →</a></div>
         </div>
     `).join('');
 
     gallery.innerHTML = `
         <div class="gallery-title">✨ Featured Artworks ✨</div>
-        <div class="film-strip" role="region" aria-label="Featured artworks">
-            <div class="film-track">
-                ${items}
-                ${items}
-            </div>
+        <div class="gallery-grid animate" role="region" aria-label="Featured artworks">
+            ${items}${items}${items}${items}
         </div>
     `;
-
-    // Initialize JS-driven film strip animation (pixel-perfect, continuous)
-    setupFilmStrip();
 }
 
 function scheduleArtGallery() {
@@ -327,88 +420,6 @@ function scheduleArtGallery() {
     } else {
         setTimeout(run, 300);
     }
-}
-
-// ===== Film-strip continuous animation (JS driven) =====
-let filmRAF = null;
-let filmOffset = 0;
-let filmPaused = false;
-let filmSpeed = 40; // pixels per second (adjustable, reduced)
-let filmSingleWidth = 0;
-
-async function setupFilmStrip() {
-    stopFilmAnimation();
-    const strip = document.querySelector('.film-strip');
-    if (!strip) return;
-    const track = strip.querySelector('.film-track');
-    if (!track) return;
-
-    // Wait for images in the track to load so measurements are accurate
-    const imgs = Array.from(track.querySelectorAll('img'));
-    await Promise.all(imgs.map(img => new Promise(res => {
-        if (img.complete && img.naturalWidth) return res();
-        img.addEventListener('load', res);
-        img.addEventListener('error', res);
-    })));
-
-    // half the track width corresponds to one sequence (we duplicated items)
-    filmSingleWidth = track.scrollWidth / 2 || track.offsetWidth || 0;
-    // start positioned so items move from left->right
-    filmOffset = -filmSingleWidth;
-    track.style.transform = `translateX(${filmOffset}px)`;
-
-    // Pause on hover
-    strip.addEventListener('mouseenter', () => { filmPaused = true; });
-    strip.addEventListener('mouseleave', () => { filmPaused = false; });
-
-    // Pause while any item is focused (keyboard navigation)
-    const items = track.querySelectorAll('.film-item');
-    items.forEach(it => {
-        it.addEventListener('focus', () => { filmPaused = true; });
-        it.addEventListener('blur', () => { filmPaused = false; });
-    });
-
-    // Recalculate on resize
-    window.addEventListener('resize', () => {
-        // small debounce
-        if (filmRAF) cancelAnimationFrame(filmRAF);
-        setTimeout(() => {
-            filmSingleWidth = track.scrollWidth / 2 || track.offsetWidth || 0;
-        }, 120);
-    });
-
-    startFilmAnimation();
-}
-
-function startFilmAnimation() {
-    if (filmRAF) cancelAnimationFrame(filmRAF);
-    const strip = document.querySelector('.film-strip');
-    if (!strip) return;
-    const track = strip.querySelector('.film-track');
-    if (!track) return;
-
-    let last = performance.now();
-
-    function step(now) {
-        const dt = (now - last) / 1000;
-        last = now;
-
-        if (!filmPaused && filmSingleWidth > 0) {
-            filmOffset += filmSpeed * dt; // move right
-            // modulo-wrap into range [-filmSingleWidth, 0)
-            filmOffset = ((filmOffset + filmSingleWidth) % filmSingleWidth) - filmSingleWidth;
-            track.style.transform = `translateX(${filmOffset}px)`;
-        }
-
-        filmRAF = requestAnimationFrame(step);
-    }
-
-    filmRAF = requestAnimationFrame(step);
-}
-
-function stopFilmAnimation() {
-    if (filmRAF) cancelAnimationFrame(filmRAF);
-    filmRAF = null;
 }
 
 // Called when a film-item is clicked — select that artwork and go to game
@@ -429,11 +440,14 @@ function displayFrontPageLeaderboard() {
     leaderboardFront.innerHTML = topEntries.map((entry, idx) => {
         const medals = ['🥇', '🥈', '🥉', '#4️⃣', '#5️⃣'];
         const medal = medals[idx] || `#${idx + 1}`;
+        const shortID = entry.playerID ? entry.playerID.substring(0, 8) : 'N/A';
+        const isCurrentPlayer = entry.playerID === currentPlayerID ? '👤' : '';
         return `
             <div class="leaderboard-item-front">
                 <span class="medal">${medal}</span>
-                <span class="name">${entry.name}</span>
+                <span class="name">${entry.name} ${isCurrentPlayer}</span>
                 <span class="moves">${entry.moves} moves</span>
+                <span class="leaderboard-id-front" title="${entry.playerID}">${shortID}</span>
             </div>
         `;
     }).join('') || '<div style="text-align: center; color: var(--text-secondary);">No scores yet!</div>';
@@ -458,11 +472,14 @@ function scrollLeaderboard() {
             leaderboardFront.innerHTML = topEntries.map((entry, idx) => {
                 const medals = ['🥇', '🥈', '🥉', '#4️⃣', '#5️⃣'];
                 const medal = medals[idx] || `#${idx + 1}`;
+                const shortID = entry.playerID ? entry.playerID.substring(0, 8) : 'N/A';
+                const isCurrentPlayer = entry.playerID === currentPlayerID ? '👤' : '';
                 return `
                     <div class="leaderboard-item-front">
                         <span class="medal">${medal}</span>
-                        <span class="name">${entry.name}</span>
+                        <span class="name">${entry.name} ${isCurrentPlayer}</span>
                         <span class="moves">${entry.moves} moves</span>
+                        <span class="leaderboard-id-front" title="${entry.playerID}">${shortID}</span>
                     </div>
                 `;
             }).join('');
@@ -472,11 +489,14 @@ function scrollLeaderboard() {
             leaderboardFront.innerHTML = allEntries.map((entry, idx) => {
                 const medals = ['🥇', '🥈', '🥉'];
                 const medal = medals[idx] || `#${idx + 1}`;
+                const shortID = entry.playerID ? entry.playerID.substring(0, 8) : 'N/A';
+                const isCurrentPlayer = entry.playerID === currentPlayerID ? '👤' : '';
                 return `
                     <div class="leaderboard-item-front">
                         <span class="medal">${medal}</span>
-                        <span class="name">${entry.name}</span>
+                        <span class="name">${entry.name} ${isCurrentPlayer}</span>
                         <span class="moves">${entry.moves} moves</span>
+                        <span class="leaderboard-id-front" title="${entry.playerID}">${shortID}</span>
                     </div>
                 `;
             }).join('') || '<div style="text-align: center; color: var(--text-secondary);">No scores yet!</div>';
@@ -518,7 +538,7 @@ async function stopGame() {
     displayFrontPageLeaderboard();
 }
 
-function generateScoreCard() {
+function generateScoreCard(username, moves) {
     return new Promise((resolve) => {
         const canvas = document.createElement('canvas');
         canvas.width = 600;
@@ -535,41 +555,41 @@ function generateScoreCard() {
             // Draw artwork as background
             ctx.drawImage(artworkImg, 0, 0, 600, 400);
             
-            // Add semi-transparent dark overlay for text readability
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+            // Add Beaks-themed overlay for text readability
+            ctx.fillStyle = 'rgba(20, 18, 36, 0.55)';
             ctx.fillRect(0, 0, 600, 400);
             
             // Title
-            ctx.font = 'bold 36px Arial';
-            ctx.fillStyle = 'white';
+            ctx.font = 'bold 36px "Playfair Display", Georgia, serif';
+            ctx.fillStyle = '#EFE7DD';
             ctx.textAlign = 'center';
-            ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.75)';
             ctx.shadowBlur = 4;
             ctx.shadowOffsetX = 2;
             ctx.shadowOffsetY = 2;
             ctx.fillText('🏆 PUZZLE VICTORY 🏆', 300, 60);
             
-            // Stats boxes
-            ctx.font = 'bold 24px Arial';
-            ctx.fillStyle = 'rgba(255, 255, 255, 1)';
+            // Stats
+            ctx.font = 'bold 22px "Inter", Arial, sans-serif';
+            ctx.fillStyle = '#EFE7DD';
             
             // Moves
-            ctx.fillText(`Moves: ${window.lastGameMoves}`, 150, 150);
+            ctx.fillText(`Moves: ${moves}`, 170, 150);
             // Time
-            ctx.fillText(`Time: ${document.getElementById('timer').textContent}`, 450, 150);
+            ctx.fillText(`Time: ${document.getElementById('timer').textContent}`, 430, 150);
             
             // Username
-            ctx.font = '20px Arial';
-            ctx.fillText(`${document.getElementById('playerName').value}`, 300, 220);
+            ctx.font = '20px "Inter", Arial, sans-serif';
+            ctx.fillText(username, 300, 220);
             
             // Footer
-            ctx.font = '18px Arial';
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
+            ctx.font = '18px "Inter", Arial, sans-serif';
+            ctx.fillStyle = '#B89A72';
             ctx.fillText('Join the Challenge! 🚀', 300, 300);
             
             // Watermark
-            ctx.font = '14px Arial';
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+            ctx.font = '14px "Inter", Arial, sans-serif';
+            ctx.fillStyle = '#EFE7DD';
             ctx.fillText('Beaks', 300, 370);
             
             resolve(canvas.toDataURL('image/png'));
@@ -577,34 +597,35 @@ function generateScoreCard() {
         artworkImg.onerror = function() {
             // Fallback to gradient if image fails
             const gradient = ctx.createLinearGradient(0, 0, 600, 400);
-            gradient.addColorStop(0, '#667eea');
-            gradient.addColorStop(1, '#764ba2');
+            gradient.addColorStop(0, '#141224');
+            gradient.addColorStop(1, '#1B1F34');
             ctx.fillStyle = gradient;
             ctx.fillRect(0, 0, 600, 400);
             
             // Title
-            ctx.font = 'bold 36px Arial';
-            ctx.fillStyle = 'white';
+            ctx.font = 'bold 36px "Playfair Display", Georgia, serif';
+            ctx.fillStyle = '#EFE7DD';
             ctx.textAlign = 'center';
             ctx.fillText('🏆 PUZZLE VICTORY 🏆', 300, 60);
             
             // Stats
-            ctx.font = 'bold 24px Arial';
-            ctx.fillText(`Moves: ${window.lastGameMoves}`, 150, 150);
+            ctx.font = 'bold 22px "Inter", Arial, sans-serif';
+            ctx.fillStyle = '#EFE7DD';
+            ctx.fillText(`Moves: ${moves}`, 170, 150);
             ctx.fillText(`Time: ${document.getElementById('timer').textContent}`, 450, 150);
             
             // Username
-            ctx.font = '20px Arial';
-            ctx.fillText(`${document.getElementById('playerName').value}`, 300, 220);
+            ctx.font = '20px "Inter", Arial, sans-serif';
+            ctx.fillText(username, 300, 220);
             
             // Footer
-            ctx.font = '18px Arial';
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+            ctx.font = '18px "Inter", Arial, sans-serif';
+            ctx.fillStyle = '#B89A72';
             ctx.fillText('Join the Challenge! 🚀', 300, 300);
             
             // Watermark
-            ctx.font = '14px Arial';
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+            ctx.font = '14px "Inter", Arial, sans-serif';
+            ctx.fillStyle = '#EFE7DD';
             ctx.fillText('Beaks', 300, 370);
             
             resolve(canvas.toDataURL('image/png'));
@@ -653,12 +674,16 @@ function displayLeaderboard() {
         } else {
             rankEmoji = `#${index + 1}`;
         }
+        
+        const shortID = entry.playerID ? entry.playerID.substring(0, 8) : 'N/A';
+        const isCurrentPlayer = entry.playerID === currentPlayerID ? '👤' : '';
 
         return `
             <div class="leaderboard-item">
                 <div class="leaderboard-rank ${rankClass}">${rankEmoji}</div>
-                <div class="leaderboard-name">${entry.name}</div>
+                <div class="leaderboard-name">${entry.name} ${isCurrentPlayer}</div>
                 <div class="leaderboard-score">${entry.moves} moves</div>
+                <div class="leaderboard-id" title="${entry.playerID}">${shortID}</div>
             </div>
         `;
     }).join('');
@@ -679,7 +704,8 @@ async function submitScore() {
     leaderboard.push({
         name: playerName.substring(0, 20),
         moves: lastGameMoves,
-        date: new Date().toLocaleDateString()
+        date: new Date().toLocaleDateString(),
+        playerID: currentPlayerID
     });
 
     localStorage.setItem('leaderboard', JSON.stringify(leaderboard));
@@ -690,7 +716,7 @@ async function submitScore() {
 }
 
 async function displayScoreCard(username, moves) {
-    const scoreCardImage = await generateScoreCard();
+    const scoreCardImage = await generateScoreCard(username, moves);
     
     // Display the score card with optional sharing
     const xPostContent = document.getElementById('xPostContent');
@@ -1068,8 +1094,24 @@ function shuffleAndStart() {
     startTimer();
 }
 
+window.addEventListener('resize', () => {
+    const loadingScreen = document.getElementById('loading-screen');
+    if (loadingScreen && loadingScreen.classList.contains('is-visible')) {
+        updateProgress(currentLoadingPercent);
+    }
+});
+
+function initFirstScreenLoading() {
+    beginLoadingOverlay();
+
+    window.setTimeout(() => {
+        endLoadingOverlay();
+    }, 950);
+}
+
 // ===== EVENT LISTENERS & INIT =====
 window.addEventListener('keydown', handleKeyPress);
 loadLeaderboard();
 document.getElementById('bestMoves').textContent = bestMoves;
 scheduleArtGallery();
+initFirstScreenLoading();
